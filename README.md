@@ -120,11 +120,23 @@ custom_theme = {
 
 ## Installation
 
-Clone the repository and install dependencies:
+Clone the repository:
 
 ```bash
 git clone https://github.com/lxghtend/raid-utility-tools.git
-cd raid-utility-tools\az-tool
+cd raid-utility-tools
+```
+
+**Using uv (recommended):**
+
+```bash
+uv sync
+```
+
+**Using pip:**
+
+```bash
+cd az-tool
 pip install -r requirements.txt
 ```
 
@@ -132,7 +144,16 @@ pip install -r requirements.txt
 
 ## Usage
 
-Each tool can be run individually:
+**Using uv:**
+
+```bash
+uv run python az-tool/main.py   # Crying Sky Raid Tool
+uv run python ds-tool/main.py   # Voracious Void Raid Tool
+uv run python pl-tool/main.py   # Cabal's Revenge Raid Tool
+uv run python lm-tool/main.py   # Ghastly Conspiracy Raid Tool
+```
+
+**Using pip (run from within the tool's directory):**
 
 ```bash
 # Voracious Void Raid Tool
@@ -152,7 +173,7 @@ python lm-tool/main.py
 
 ## Requirements
 - Python **3.11+**  
-- Dependencies listed in `requirements.txt`
+- Dependencies listed in `requirements.txt` (pip) or `pyproject.toml` (uv)
 
 ---
 

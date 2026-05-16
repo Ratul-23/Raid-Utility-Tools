@@ -1,0 +1,21 @@
+[project]
+name = "raid-utility-tools"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "loguru==0.7.3",
+    "memobj",
+    "numpy==2.3.3",
+    "keyboard==0.13.5",
+    "pyperclip==1.9.0",
+    "PyQt6==6.9.1",
+    "pyqt6-sip==13.10.2",
+    "qasync==0.28.0",
+    "Shapely==2.1.1",
+    "wizwalker",
+    "wizsprinter",
+]
+
+[tool.uv.sources]
+wizwalker = { git = "https://github.com/Deimos-Wizard101/wizwalker", branch = "development" }
+wizsprinter = { git = "https://github.com/Deimos-Wizard101/wizsprinter", branch = "main" }
