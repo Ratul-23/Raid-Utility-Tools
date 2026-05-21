@@ -1,7 +1,7 @@
 [project]
 name = "raid-utility-tools"
 version = "0.1.0"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "loguru==0.7.3",
     "memobj",
@@ -16,6 +16,12 @@ dependencies = [
     "wizsprinter",
 ]
 
+[tool.uv.workspace]
+members = ["libraries/wizwalker", "libraries/wizsprinter"]
+
 [tool.uv.sources]
-wizwalker = { git = "https://github.com/Deimos-Wizard101/wizwalker", branch = "development" }
-wizsprinter = { git = "https://github.com/Deimos-Wizard101/wizsprinter", branch = "main" }
+wizwalker = { workspace = true }
+wizsprinter = { workspace = true }
+
+[tool.ruff]
+line-length = 120

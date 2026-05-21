@@ -370,128 +370,110 @@ class Themes():
 
         self.mooshu = """
             /* ==============================
-            Jade Palace Theme - PyQt6 (Mooshu)
-            Inspired by imperial red lacquer, jade, and gold accents.
-            Font: cursive (for a calligraphic, elegant feel)
+            Mooshu Theme - PyQt6
+            Dark mode with cherry blossom accents
             ============================== */
 
-            /* Base widget background */
             QWidget {
-                background-color: #2A3D2F;      /* Deep jade green */
-                color: #EAE0C8;                /* Aged parchment text */
+                background-color: #1A1A1A;
+                color: #F5F5F5;
                 font-family: "Lucida Handwriting", "Brush Script MT", cursive;
-                font-size: 16px;
+                font-size: 13px;
             }
 
-            /* Buttons */
             QPushButton {
-                background-color: #982B2B;      /* Imperial red lacquer */
-                color: #FFFFFF;                /* Clean white text */
-                border: 2px solid #C9A86B;      /* Muted gold border */
-                border-radius: 8px;             /* Smoother, rounded corners */
+                background-color: #1E1E1E;
+                color: #F5F5F5;
+                border: 1px solid #FFB7C5;
+                border-radius: 8px;
                 padding: 6px 14px;
-                font-size: 17px;
+                font-size: 13px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #B04A4A;      /* Lighter, glowing red */
-                border: 2px solid #FFD700;      /* Bright, shining gold */
+                background-color: #2E1A20;
+                border: 1px solid #FF8FA3;
             }
             QPushButton:pressed {
-                background-color: #782222;      /* Deeper lacquer red */
-                border: 2px solid #B8860B;      /* Darker gold */
-                color: #EAE0C8;
+                background-color: #3D1020;
+                border: 1px solid #E8637A;
+                color: #FFB7C5;
             }
 
-            /* Labels */
             QLabel {
-                color: #FFD700;                /* Imperial gold */
+                color: #FFB7C5;
                 background-color: transparent;
-                font-size: 16px;
+                font-size: 13px;
                 font-weight: bold;
             }
 
-            /* Line edits (text boxes) */
+            QGroupBox {
+                color: #FFB7C5;
+                font-weight: bold;
+                font-size: 13px;
+            }
+
             QLineEdit {
-                background-color: #29332B;      /* Dark jade slate */
-                color: #EAE0C8;
-                border: 1px solid #556B5A;      /* Jade outline */
+                background-color: #1A1A1A;
+                color: #F5F5F5;
+                border: 1px solid #FFB7C5;
                 border-radius: 6px;
                 padding: 4px;
             }
             QLineEdit:focus {
-                border: 2px solid #FFD700;      /* Focused gold glow */
-                background-color: #333F36;
+                border: 2px solid #FF8FA3;
+                background-color: #222222;
             }
 
-            /* Tabs and Frames */
-            QTabBar::tab {
-                background: #4A5D53;
-                color: #EAE0C8;
-                padding: 8px;
-                font-size: 11px; /* Smaller font for tabs */
-                border: 1px solid #556B5A;
-                border-bottom: none;
-                border-top-left-radius: 6px;
-                border-top-right-radius: 6px;
-            }
-            QTabBar::tab:selected {
-                background: #2A3D2F; /* Match main background */
-                color: #FFD700; /* Gold for selected tab */
-            }
-            QTabWidget::pane {
-                border: 1px solid #556B5A;
-                border-top: none;
+            QCheckBox, QRadioButton {
+                color: #F5F5F5;
             }
 
-            /* ComboBox */
             QComboBox {
-                background-color: #29332B;
-                color: #EAE0C8;
-                border: 1px solid #556B5A;
+                background-color: #1A1A1A;
+                color: #F5F5F5;
+                border: 1px solid #FFB7C5;
                 border-radius: 6px;
                 padding: 4px;
             }
             QComboBox:hover {
-                background-color: #333F36;
+                background-color: #222222;
             }
             QComboBox::drop-down {
                 border: none;
             }
 
-            /* Scrollbars */
             QScrollBar:vertical {
-                background: #2A3D2F;           /* Deep jade green */
+                background: #1A1A1A;
                 width: 12px;
                 margin: 0px;
             }
             QScrollBar::handle:vertical {
-                background: #556B5A;           /* Jade handle */
+                background: #FFB7C5;
                 border-radius: 6px;
                 min-height: 20px;
             }
             QScrollBar::handle:vertical:hover {
-                background: #FFD700;           /* Gold handle on hover */
+                background: #FF8FA3;
             }
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                 height: 0px;
                 background: none;
             }
 
-            /* Progress Bar */
             QProgressBar {
-                border: 2px solid #C9A86B;      /* Gold border */
+                border: 2px solid #FFB7C5;
                 border-radius: 8px;
                 text-align: center;
-                color: #1A1411;                /* Darkest brown for legibility */
-                background-color: #29332B;      /* Dark Jade */
+                color: #F5F5F5;
+                background-color: #1A1A1A;
                 font-weight: bold;
             }
             QProgressBar::chunk {
-                background-color: #556B5A;      /* Solid Jade chunk */
+                background-color: #FF8FA3;
                 border-radius: 6px;
             }
-        """     
+        """
 
         self.custom_theme = self.build_stylesheet(custom_theme)
 

@@ -1,4 +1,5 @@
 import sys
+import os
 import ctypes
 import asyncio
 import keyboard
@@ -907,7 +908,7 @@ class ThemesTab(QWidget):
         print(f"[THEMES] Night theme enabled.")
 
         self.window().setStyleSheet(self.themes.night)
-    
+
     def enable_celestia_theme(self):
         print(f"[THEMES] Celestia theme enabled.")
 
@@ -1032,7 +1033,7 @@ def main():
     appid = "lxghtend.cryingsky.tool.1.0"
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(appid)
 
-    app.setWindowIcon(QIcon("icon.ico"))
+    app.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), "icon.ico")))
 
     app.setStyle("Fusion")
 

@@ -8,4 +8,4 @@ pyqt6_sip==13.10.2
 qasync==0.28.0
 Shapely==2.1.1
 git+https://github.com/Deimos-Wizard101/wizwalker@development
-git+https://github.com/Deimos-Wizard101/wizsprinter@lib-update
+git+https://github.com/Deimos-Wizard101/wizsprinter@main

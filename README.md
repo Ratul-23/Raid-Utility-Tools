@@ -172,7 +172,7 @@ python lm-tool/main.py
 ---
 
 ## Requirements
-- Python **3.11+**  
+- Python **3.13+**  
 - Dependencies listed in `requirements.txt` (pip) or `pyproject.toml` (uv)
 
 ---

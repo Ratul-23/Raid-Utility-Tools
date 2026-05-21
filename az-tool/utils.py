@@ -1,15 +1,15 @@
-import time
 import asyncio
-import pyperclip
-import threading
 import configparser
-from wizwalker import ClientHandler, Client, XYZ
-from wizwalker.memory import Window, MemoryReader
+import threading
+import time
+
+import pyperclip
+from wizwalker import XYZ, Client, ClientHandler
 from wizwalker.constants import Keycode, Primitive
-from wizwalker.errors import ReadingEnumFailed, HookNotActive
+from wizwalker.errors import HookNotActive, ReadingEnumFailed
+from wizwalker.memory import MemoryReader, Window
 from wizwalker.memory.memory_objects.enums import WindowFlags
 from wizwalker.memory.memory_objects.fish import FishStatusCode
-
 from worlds_collide import WorldsCollideTP
 
 excluded_drums = [
@@ -55,9 +55,7 @@ class Utils():
             for client in self.get_open_clients():
                 try:
                     window = (await client.root_window.get_windows_with_name('txtTestRealmText'))[0]
-
                     await write_window_rectangle(window, 10, 146, 153, 165)
-                    
                     await window.write_maybe_text('HOOKED')
                     await window.write_flags(WindowFlags.visible)
 
@@ -81,7 +79,7 @@ class Utils():
         settings["toggle_freecam"] = self.config_parser.get("Keybinds", "toggle_freecam", fallback="F5")
         settings["handle_freecam_teleport"] = self.config_parser.get("Keybinds", "handle_freecam_teleport", fallback="F6")
         settings["toggle_auto_dialogue"] = self.config_parser.get("Keybinds", "toggle_auto_dialogue", fallback="F7")
-        
+
         return settings
 
     async def is_visible_by_path(self, base_window: Window, path: list[str]):
@@ -97,7 +95,7 @@ class Utils():
                 if found_window := await self.window_from_path(child, path[1:]):
                     return found_window
         return False
-    
+
     def are_xyzs_within_threshold(self, xyz_1 : XYZ, xyz_2 : XYZ, threshold : int = 200):
     # checks if 2 xyz's are within a rough distance threshold of each other. Not actual distance checking, but precision isn't needed for this, this exists to eliminate tiny variations in XYZ when being sent back from a failed port.
         threshold_check = [abs(abs(xyz_1.x) - abs(xyz_2.x)) < threshold, abs(abs(xyz_1.y) - abs(xyz_2.y)) < threshold, abs(abs(xyz_1.z) - abs(xyz_2.z)) < threshold]
@@ -133,7 +131,7 @@ class Utils():
     async def handle_auto_dialogue(self, client: Client):
         try:
             print(f"{client.title} auto dialogue activated.")
-                
+
             while True:
                 if await self.is_visible_by_path(client.root_window, ['WorldView', 'wndDialogMain', 'btnRight']):
                     await client.send_key(Keycode.SPACEBAR)
@@ -141,11 +139,11 @@ class Utils():
 
         except asyncio.CancelledError:
                 print(f"{client.title} auto dialogue deactivated.")
-        
+
     async def handle_speedhack(self, client: Client):
         try:
             print(f"{client.title} speedhack activated.")
-            
+
             while True:
                 await client.client_object.write_speed_multiplier(400)
                 await asyncio.sleep(1)
@@ -161,7 +159,7 @@ class Utils():
                 while True:
                     if not await client.game_client.is_freecam():
                         await client.camera_freecam()
-                        print(f"[TOGGLE] Freecam started.")
+                        print("[TOGGLE] Freecam started.")
 
                     await asyncio.sleep(0)
 
@@ -186,7 +184,7 @@ class Utils():
             client_position = await client.body.position()
 
             for teleporting_client in self.handler.get_ordered_clients():
-                if not teleporting_client is client:
+                if teleporting_client is not client:
                     await teleporting_client.teleport(client_position)
 
     async def copy_position(self):
@@ -240,7 +238,7 @@ class Utils():
             if not item:
                 print(f"{client.title} did not find {entity_name}.")
                 return
-            
+
             item_position = await item[0].location()
 
             await WorldsCollideTP(client, item_position)
@@ -316,7 +314,7 @@ class Utils():
 
                         print(f"{client.title} activated drum {i + 1}.")
 
-                print(f"[AUTO DRUMS] completed drums.")
+                print("[AUTO DRUMS] completed drums.")
 
             except asyncio.CancelledError:
                 print(f"[AUTO DRUMS] cancelled at drum #{i + 1}.")
@@ -324,7 +322,7 @@ class Utils():
     async def read_tokens(self) -> list[list]:
         client = self.foreground_client
         if client:
-            tokens = [] 
+            tokens = []
 
             for entity in  await client.get_base_entity_list():
                 entity_name = await entity.object_name()
@@ -341,13 +339,13 @@ class Utils():
                         token_info.append(string)
 
                         tokens.append(token_info)
-            
+
             if not tokens:
                 print(f"{client.title} did not find any tokens.")
                 return
 
             return tokens
-        
+
     async def token_teleport(self, token_name: str):
         client = self.foreground_client
         if client:
@@ -368,64 +366,64 @@ class Utils():
             old_bytes = await reader.read_bytes(add, len(write_bytes))
             await reader.write_bytes(add, write_bytes)
             return (add, old_bytes)
-        
-        address_oldbytes = [] 
+
+        address_oldbytes = []
         reader = MemoryReader(client._pymem)
-        
+
         async def scare_fish_patch():
             # scare fish patch
             num_nops = 5
             write_bytes = b"\x90" * num_nops
             pattern = rb"\xE8....\xEB.\x83\xF9\x04\x75..\xC7\x87" # E8 ?? ?? ?? ?? EB ?? 83 F9 04 75 ?? ?? C7 87
             address_oldbytes.append(await readbytes_writebytes(pattern, write_bytes))
-        
+
         async def bobber_submerison_rng_patch():
             # bobber submerison rng patch
             num_nops = 2
             write_bytes = b"\x90" * num_nops
             pattern = rb"\x7D\x37\xC7\x83........\xC7\x83" # 7D 37 C7 83 ?? ?? ?? ?? ?? ?? ?? ?? C7 83
             address_oldbytes.append(await readbytes_writebytes(pattern, write_bytes))
-        
+
         async def fish_notice_bobber_instant_patch():
             # fish notice bobber instant patch
             num_nops = 6
             write_bytes = b"\x90" * num_nops
             pattern = rb"\x0F\x82....\xC7\x83........\x8B\x93" # 0F 82 ?? ?? ?? ?? C7 83 ?? ?? ?? ?? ?? ?? ?? ?? 8B 93
             address_oldbytes.append(await readbytes_writebytes(pattern, write_bytes))
-        
+
         async def instant_fish():
             # patch instant fish
             num_nops = 2
             write_bytes = b"\x90" * num_nops
             pattern = rb"\x74\x64\x48\x8B\xCF\xE8....\x44\x0F" #74 64 48 8B CF E8 ?? ?? ?? ?? 44 0F
             address_oldbytes.append(await readbytes_writebytes(pattern, write_bytes))
-        
+
         async def instant_fish_2():
-            # patch instant fish # 2 
+            # patch instant fish # 2
             num_nops = 6
             write_bytes = b"\x90" * num_nops
             pattern = rb"\x0F\x82....\xF3\x44\x0F\x10\x0D....\x41\x0F\x2F\xC1" #0F 82 ?? ?? ?? ?? F3 44 0F 10 0D ?? ?? ?? ?? 41 0F 2F C1
             address_oldbytes.append(await readbytes_writebytes(pattern, write_bytes))
-        
+
         async def instant_fish_3():
             # patch instant fish # 3
             num_nops = 6
             write_bytes = b"\x90" * num_nops
             pattern = rb"\x0F\x86....\xF3\x41\x0F\x5C\xF2" #0F 86 ?? ?? ?? ?? F3 41 0F 5C F2
             address_oldbytes.append(await readbytes_writebytes(pattern, write_bytes))
-        
+
         async def instant_fish_4():
             # patch instant fish # 4
             num_nops = 6
             write_bytes = b"\x90" * num_nops
             pattern = rb"\x0F\x86....\x44\x0F\x2F\x05" #0F 86 ?? ?? ?? ?? 44 0F 2F 05
             address_oldbytes.append(await readbytes_writebytes(pattern, write_bytes))
-        
+
         async def instant_fish_5():
             # patch instant fish # 5
             num_nops = 6
             write_bytes = b"\x90" * num_nops
-            pattern = rb"\x0F\x84....\x48\x8B\x8B....\x45\x32" #0F 84 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 45 32 
+            pattern = rb"\x0F\x84....\x48\x8B\x8B....\x45\x32" #0F 84 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 45 32
             address_oldbytes.append(await readbytes_writebytes(pattern, write_bytes))
 
         async def instant_fish_6():
@@ -448,14 +446,14 @@ class Utils():
             write_bytes = b"\x90" * num_nops
             pattern = rb"\x0F\x86....\xF3\x0F\x10\x83....\xF3\x0F\x5C\x83" #0F 86 ?? ?? ?? ?? F3 0F 10 83 ?? ?? ?? ?? F3 0F 5C 83
             address_oldbytes.append(await readbytes_writebytes(pattern, write_bytes))
-        
+
         async def instant_fish_9():
             # patch instant fish # 9
             num_nops = 6
             write_bytes = b"\x90" * num_nops
             pattern = rb"\x0F\x87....\xF2\x0F\x10\xB3....\xF2" #0F 87 ?? ?? ?? ?? F2 0F 10 B3 ?? ?? ?? ?? F2
             address_oldbytes.append(await readbytes_writebytes(pattern, write_bytes))
-        
+
         async def skip_bobbing_patch():
             # skipping bobbing animation
             pattern = rb"\x0F\x82....\xF3\x0F\x11\x97" #0F 82 ?? ?? ?? ?? F3 0F 11 97
@@ -490,13 +488,13 @@ class Utils():
             skip_catch_animation(),
             skip_struggle(),
         ]
-        
+
         print(f"{client.title} activating fish patches...")
         await asyncio.gather(*patches)
         print(f"{client.title} completed fish patches.")
 
         return address_oldbytes
-        
+
     async def reset_fish_patch(self, client: Client, address_bytes: list[tuple[int, bytes]]):
         print(f"{client.title} deactivating fish patches...")
         reader = MemoryReader(client._pymem)
@@ -511,7 +509,7 @@ class Utils():
                 print(f"[FISH] Catching {school} fish.")
                 fishing_manager = await client.game_client.fishing_manager()
                 if len(await fishing_manager.fish_list()) == 0:
-                    print(f"[FISH] No fish found.")
+                    print("[FISH] No fish found.")
                     return
                 for fish in await fishing_manager.fish_list():
                     fish_temp = await fish.template()
@@ -537,7 +535,7 @@ class Utils():
                         icon1 = await bottomframe.get_child_by_name("Icon1")
                         async with client.mouse_handler:
                             await client.mouse_handler.click_window(icon1)
-                        
+
                         is_hooked = False
                         while not is_hooked:
                             status = await fish.status_code()
@@ -555,7 +553,7 @@ class Utils():
                             if time.time() - timeout >= 10:
                                 fish_failed = True
                                 break
-                        
+
                         if fish_failed:
                             continue
 
@@ -564,7 +562,7 @@ class Utils():
                             await asyncio.sleep(0.1)
 
                         break
-            
+
             except ReadingEnumFailed:
                 pass
 
@@ -572,20 +570,20 @@ class Utils():
         client = self.foreground_client
 
         schools = {
-        "Fire": 0, 
-        "Storm": 0, 
-        "Myth": 0, 
-        "Death": 0, 
+        "Fire": 0,
+        "Storm": 0,
+        "Myth": 0,
+        "Death": 0,
         "Ice": 0
         }
 
         if client:
-            print(f"[FISH] Catching all fish.")
+            print("[FISH] Catching all fish.")
             fishing_manager = await client.game_client.fishing_manager()
             if len(await fishing_manager.fish_list()) == 0:
-                print(f"[FISH] No fish found.")
+                print("[FISH] No fish found.")
                 return
-            
+
             accepted_fish = []
 
             for fish in await fishing_manager.fish_list():
@@ -636,7 +634,7 @@ class Utils():
                     if time.time() - timeout >= 10:
                         fish_failed = True
                         break
-                
+
                 if fish_failed:
                     continue
 
