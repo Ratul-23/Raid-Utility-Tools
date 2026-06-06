@@ -28,7 +28,6 @@ from themes import Themes
 from utils import Utils
 from wizwalker import XYZ, Client
 from wizwalker.errors import HookAlreadyActivated
-from wizwalker.utils import override_wiz_install_location
 
 
 class HooksTab(QWidget):
@@ -1087,8 +1086,6 @@ class DisclaimerDialog(QDialog):
 
 
 def main() -> None:
-    override_wiz_install_location(r"C:\ProgramData\KingsIsle Entertainment\Wizard101 Test")
-
     app: QApplication = QApplication(sys.argv)
 
     appid: str = "lxghtend.ms.tool.1.0"

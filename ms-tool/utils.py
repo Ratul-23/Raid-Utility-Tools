@@ -35,7 +35,7 @@ class Utils():
         self.foreground_client: Client | None = None
 
         threading.Thread(target=self.update_foreground_client, daemon=True).start()
-        # threading.Thread(target=lambda: asyncio.run(self.update_hooked_text()), daemon=True).start()
+        threading.Thread(target=lambda: asyncio.run(self.update_hooked_text()), daemon=True).start()
 
 
     def update_foreground_client(self) -> None:

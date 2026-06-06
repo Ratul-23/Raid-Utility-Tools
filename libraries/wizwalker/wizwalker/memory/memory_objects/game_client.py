@@ -21,9 +21,10 @@ class GameClient(MemoryObject):
 
     async def elastic_camera_controller(self) -> Optional[DynamicElasticCameraController]:
         offset = await self.pattern_scan_offset_cached(
-            rb"\x90\x48\x8B\x8F....\xF3\x0F\x10\x3D...."
-            rb"\xF3\x0F\x10\x35....\x48\x85\xC9\x74",
-            4,
+            rb"\x48\x8B\x93\xD8\x1F\x02\x00\x41\xFF\xD1\x32"
+            rb"\xC0\xEB\x05\x41\xFF\xD1\xB0\x01\x88\x83\x20"
+            rb"\x20\x02\x00\x48\x8B\x07\x33\xD2\x48\x8B\xCF",
+            3,
             "elastic_camera_controller",
             0x222C8
         )
@@ -37,8 +38,8 @@ class GameClient(MemoryObject):
 
     async def free_camera_controller(self) -> Optional[DynamicFreeCameraController]:
         offset = await self.pattern_scan_offset_cached(
-            rb"\x48\x8B\x93....\x48\x8B\x03\x41\xB8\x01\x00\x00\x00"
-            rb"\x48\x8B\xCB\x48\x3B\xFA\x75",
+            rb"\x48\x8B\x93....\x48\x8B\x03\x4C\x8B\x88...."
+            rb"\x41\xB8\x01\x00\x00\x00\x48\x8B\xCB\x48\x3B\xFA\x75",
             3,
             "free_camera_controller",
             0x222D8
@@ -56,8 +57,9 @@ class GameClient(MemoryObject):
         The in use camera controller
         """
         offset = await self.pattern_scan_offset_cached(
-            rb"\x48\x8B\xBB....\x48\x8B\x93....\x48\x8B\x03"
-            rb"\x41\xB8\x01\x00\x00\x00\x48\x8B\xCB\x48\x3B\xFA\x75",
+            rb"\x48\x89\x87\x08\x20\x02\x00\x48\x8D\x8F"
+            rb"\x10\x20\x02\x00\x48\x8D\x54\x24\x40\xE8"
+            rb"....\x90\x48\x8B\x4C\x24",
             3,
             "selected_camera_controller",
             0x222F8
@@ -78,8 +80,9 @@ class GameClient(MemoryObject):
             selected_camera_controller = await selected_camera_controller.read_base_address()
 
         offset = await self.pattern_scan_offset_cached(
-            rb"\x48\x8B\xBB....\x48\x8B\x93....\x48\x8B\x03"
-            rb"\x41\xB8\x01\x00\x00\x00\x48\x8B\xCB\x48\x3B\xFA\x75",
+            rb"\x48\x89\x87\x08\x20\x02\x00\x48\x8D\x8F"
+            rb"\x10\x20\x02\x00\x48\x8D\x54\x24\x40\xE8"
+            rb"....\x90\x48\x8B\x4C\x24",
             3,
             "selected_camera_controller",
             0x222F8
@@ -92,9 +95,9 @@ class GameClient(MemoryObject):
         If the game is currently in freecam mode
         """
         offset = await self.pattern_scan_offset_cached(
-            rb"\x0F\xB6\x88\xA8\x22\x02\x00\x88\x8B\x6A"
+            rb"\x0F\xB6\x88\x20\x20\x02\x00\x88\x8B\x6A"
             rb"\x02\x00\x00\x84\xC9\x0F\x85....\x48\x8D"
-            rb"\x55\xD0\x48\x8B\xCB\xE8",
+            rb"\x55\xE0\x48\x8B\xCB\xE8",
             3,
             "is_freecam",
             0x22310
@@ -106,9 +109,9 @@ class GameClient(MemoryObject):
         Write if the game is currently in freecam mode
         """
         offset = await self.pattern_scan_offset_cached(
-            rb"\x0F\xB6\x88\xA8\x22\x02\x00\x88\x8B\x6A"
+            rb"\x0F\xB6\x88\x20\x20\x02\x00\x88\x8B\x6A"
             rb"\x02\x00\x00\x84\xC9\x0F\x85....\x48\x8D"
-            rb"\x55\xD0\x48\x8B\xCB\xE8",
+            rb"\x55\xE0\x48\x8B\xCB\xE8",
             3,
             "is_freecam",
             0x22310
@@ -256,7 +259,7 @@ class GameClient(MemoryObject):
         return DynamicGamebryoPresenter(self.hook_handler, addr)
 
     async def fishing_manager(self) -> FishingManager:
-        addr = await self.read_value_from_offset(0x23140, Primitive.uint64)
+        addr = await self.read_value_from_offset(0x231a8, Primitive.uint64)
         return FishingManager(self.hook_handler, addr)
 
 class CurrentGameClient(GameClient):
