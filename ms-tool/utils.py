@@ -33,6 +33,7 @@ class Utils:
         self.handler: ClientHandler = ClientHandler()
         self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
         self.foreground_client: Client | None = None
+        self.freecam_task: asyncio.Task[XYZ | None] | None = None
 
         threading.Thread(target=self.update_foreground_client, daemon=True).start()
         threading.Thread(target=lambda: asyncio.run(self.update_hooked_text()), daemon=True).start()
@@ -130,17 +131,17 @@ class Utils:
 
     async def activate_hooks(self, client: Client) -> None:
         await client.activate_hooks()
-        print(f"{client.title} hooks activated.")
+        print(f"{client.title} Hooks activated")
 
     async def deactivate_hooks(self, client: Client) -> None:
         # hooked_window: DynamicWindow = (await client.root_window.get_windows_with_name('txtTestRealmText'))[0]
         # await hooked_window.write_flags(WindowFlags.disabled)
         await client.close()
-        print(f"{client.title} hooks deactivated.")
+        print(f"{client.title} Hooks deactivated")
 
     async def handle_auto_dialogue(self, client: Client) -> None:
         try:
-            print(f"{client.title} auto dialogue activated.")
+            print(f"{client.title} Auto dialogue activated")
 
             while True:
                 if await self.is_visible_by_path(client.root_window, ["WorldView", "wndDialogMain", "btnRight"]):
@@ -149,11 +150,11 @@ class Utils:
                 await asyncio.sleep(0.5)
 
         except asyncio.CancelledError:
-            print(f"{client.title} auto dialogue deactivated.")
+            print(f"{client.title} Auto dialogue deactivated")
 
     async def handle_speedhack(self, client: Client, multiplier: float) -> None:
         try:
-            print(f"{client.title} speedhack activated at {multiplier / 100:g}x.")
+            print(f"{client.title} Speedhack activated at {multiplier / 100:g}x")
 
             while True:
                 await client.client_object.write_speed_multiplier(round(multiplier))
@@ -161,7 +162,7 @@ class Utils:
 
         except asyncio.CancelledError:
             await client.client_object.write_speed_multiplier(1)
-            print(f"{client.title} speedhack deactivated.")
+            print(f"{client.title} Speedhack deactivated")
 
     async def handle_freecam(self) -> XYZ | None:
         client: Client | None = self.foreground_client
@@ -171,7 +172,7 @@ class Utils:
                 while True:
                     if not await client.game_client.is_freecam():
                         await client.camera_freecam()
-                        print("[TOGGLE] Freecam started.")
+                        print("[TOGGLE] Freecam started")
 
                     await asyncio.sleep(0)
 
@@ -188,7 +189,7 @@ class Utils:
 
         if client:
             await client.teleport(camera_pos, wait_on_inuse=True, purge_on_after_unuser_fixer=True)
-            print(f"{client.title} teleported to freecam position.")
+            print(f"{client.title} Teleported to freecam position")
 
     async def xyz_sync(self) -> None:
         client: Client | None = self.foreground_client
@@ -205,7 +206,7 @@ class Utils:
 
         if client:
             current_pos: XYZ = await client.body.position()
-            print(f"{client.title} copied current position at {current_pos}.")
+            print(f"{client.title} Copied current position at {current_pos}")
             pyperclip.copy(f"XYZ({current_pos.x}, {current_pos.y}, {current_pos.z})")
 
     async def handle_basic_teleport(
@@ -226,14 +227,14 @@ class Utils:
             entities: list[DynamicClientObject] = await client.get_base_entities_with_name("Raid_MS_Shadow_Wisp_01")
 
             if not entities:
-                print(f"{client.title} did not find Raid_MS_Shadow_Wisp_01.")
+                print(f"{client.title} Did not find Raid_MS_Shadow_Wisp_01")
                 return
 
             original_location: XYZ = await client.body.position()
             await WorldsCollideTP(client, await entities[0].location())
             await asyncio.sleep(2)
             await client.teleport(original_location)
-            print(f"{client.title} wisp teleport complete.")
+            print(f"{client.title} Wisp teleport complete")
 
     async def entity_teleport(self, entity_name: str) -> None:
         client: Client | None = self.foreground_client
@@ -242,11 +243,11 @@ class Utils:
             entity: list[DynamicClientObject] = await client.get_base_entities_with_name(entity_name)
 
             if not entity:
-                print(f"{client.title} did not find {entity_name}")
+                print(f"{client.title} Did not find {entity_name}")
                 return
 
             await WorldsCollideTP(client, await entity[0].location())
-            print(f"{client.title} teleported to {entity_name}.")
+            print(f"{client.title} Teleported to {entity_name}")
 
     async def mob_entity_teleport(self, entity_name: str) -> None:
         client: Client | None = self.foreground_client
@@ -255,7 +256,7 @@ class Utils:
             entity: list[DynamicClientObject] = await client.get_base_entities_with_name(entity_name)
 
             if not entity:
-                print(f"{client.title} did not find {entity_name}")
+                print(f"{client.title} Did not find {entity_name}")
                 return
 
             entity_pos: XYZ = await entity[0].location()
@@ -264,24 +265,27 @@ class Utils:
                 return
 
             await WorldsCollideTP(client, entity_pos)
-            print(f"{client.title} teleported to {entity_name}.")
+            print(f"{client.title} Teleported to {entity_name}")
 
     async def entity_freecam_teleport(self, entity_name: str) -> None:
         client: Client | None = self.foreground_client
 
         if client:
             if not await client.game_client.is_freecam():
-                print(f"{client.title} is not in freecam.")
-                return
+                await client.camera_freecam()
+
+                if not self.freecam_task:
+                    self.freecam_task = asyncio.create_task(self.handle_freecam())
+
+                print("[TOGGLE] Freecam started")
 
             entities: list[DynamicClientObject] = await client.get_base_entities_with_name(entity_name)
             entity: DynamicClientObject | None = entities[0] if entities else None
-
             camera: DynamicFreeCameraController | None = await client.game_client.free_camera_controller()
 
             if entity and camera:
                 await camera.write_position(await entity.location())
-                print(f"{client.title} camera teleported to {entity_name}.")
+                print(f"{client.title} Camera teleported to {entity_name}")
 
     async def grab_item(self, entity_name: str) -> None:
         client: Client | None = self.foreground_client
@@ -291,7 +295,7 @@ class Utils:
             item: list[DynamicClientObject] = await client.get_base_entities_with_name(entity_name)
 
             if not item:
-                print(f"{client.title} did not find {entity_name}.")
+                print(f"{client.title} Did not find {entity_name}")
                 return
 
             item_position: XYZ = await item[0].location()
@@ -321,7 +325,7 @@ class Utils:
             if await client.body.position() != original_location:
                 await client.teleport(original_location)
 
-            print(f"{client.title} grabbed {entity_name}.")
+            print(f"{client.title} Grabbed {entity_name}")
 
     async def raid_drum_teleport(self) -> None:
         client: Client | None = self.foreground_client
@@ -330,7 +334,7 @@ class Utils:
             drum_list: list[DynamicClientObject] = await client.get_base_entities_with_name("Raid_LightPad")
 
             if not drum_list:
-                print(f"{client.title} did not find Raid_LightPad.")
+                print(f"{client.title} Did not find Raid_LightPad")
                 return
 
             filtered_drums: list[DynamicClientObject] = []
@@ -348,7 +352,7 @@ class Utils:
         windows: list[DynamicWindow] = await client.root_window.get_windows_with_type("BattlegroundMiniMapWindow")
 
         if not windows:
-            print(f"{client.title} minimap window not found.")
+            print(f"{client.title} Minimap window not found")
             return
 
         minimap_window: DynamicWindow = windows[0]
@@ -356,7 +360,7 @@ class Utils:
         await minimap_window.write_flags(
             curr_flags ^ WindowFlags(WindowFlags.visible) ^ WindowFlags(WindowFlags.disabled)
         )
-        print(f"{client.title} minimap toggled.")
+        print(f"{client.title} Minimap toggled")
 
     async def auto_raid_drums(self) -> None:
         client: Client | None = self.foreground_client
@@ -399,9 +403,9 @@ class Utils:
                 except TimeoutError:
                     break
 
-                print(f"{client.title} activated drum {i + 1}.")
+                print(f"{client.title} Activated drum {i + 1}")
 
-            print("[AUTO DRUMS] completed drums.")
+            print("[AUTO DRUMS] Completed drums")
 
         except asyncio.CancelledError:
-            print("[AUTO DRUMS] cancelled.")
+            print("[AUTO DRUMS] Cancelled")

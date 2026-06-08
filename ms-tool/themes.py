@@ -300,86 +300,91 @@ class Themes():
             ============================== */
 
             QWidget {
-                background-color: #1A1A1A;
-                color: #F5F5F5;
+                background-color: #0b0b0b;
+                color: #eeeeee;
                 font-family: "Lucida Handwriting", "Brush Script MT", cursive;
                 font-size: 13px;
             }
 
             QPushButton {
-                background-color: #1E1E1E;
-                color: #F5F5F5;
-                border: 1px solid #FFB7C5;
+                background-color: #161616;
+                color: #eeeeee;
+                border: 1px solid #bd5b7d;
                 border-radius: 8px;
                 padding: 6px 14px;
                 font-size: 13px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #2E1A20;
-                border: 1px solid #FF8FA3;
+                background-color: #1a0d14;
+                border: 1px solid #ce6a8c;
             }
             QPushButton:pressed {
-                background-color: #3D1020;
-                border: 1px solid #E8637A;
-                color: #FFB7C5;
+                background-color: #28091a;
+                border: 1px solid #bd5b7d;
+                color: #bd5b7d;
+            }
+            QPushButton:disabled {
+                background-color: #0b0b0b;
+                color: #484848;
+                border: 1px solid #2e2e2e;
             }
 
             QLabel {
-                color: #FFB7C5;
+                color: #bd5b7d;
                 background-color: transparent;
                 font-size: 13px;
                 font-weight: bold;
             }
 
             QGroupBox {
-                color: #FFB7C5;
+                color: #bd5b7d;
                 font-weight: bold;
                 font-size: 13px;
             }
 
             QLineEdit {
-                background-color: #1A1A1A;
-                color: #F5F5F5;
-                border: 1px solid #FFB7C5;
+                background-color: #0b0b0b;
+                color: #eeeeee;
+                border: 1px solid #bd5b7d;
                 border-radius: 6px;
                 padding: 4px;
             }
             QLineEdit:focus {
-                border: 2px solid #FF8FA3;
-                background-color: #222222;
+                border: 2px solid #ce6a8c;
+                background-color: #161616;
             }
 
             QCheckBox, QRadioButton {
-                color: #F5F5F5;
+                color: #eeeeee;
             }
 
             QComboBox {
-                background-color: #1A1A1A;
-                color: #F5F5F5;
-                border: 1px solid #FFB7C5;
+                background-color: #0b0b0b;
+                color: #eeeeee;
+                border: 1px solid #bd5b7d;
                 border-radius: 6px;
                 padding: 4px;
             }
             QComboBox:hover {
-                background-color: #222222;
+                background-color: #161616;
             }
             QComboBox::drop-down {
                 border: none;
             }
 
             QScrollBar:vertical {
-                background: #1A1A1A;
+                background: #0b0b0b;
                 width: 12px;
                 margin: 0px;
             }
             QScrollBar::handle:vertical {
-                background: #FFB7C5;
+                background: #bd5b7d;
                 border-radius: 6px;
                 min-height: 20px;
             }
             QScrollBar::handle:vertical:hover {
-                background: #FF8FA3;
+                background: #ce6a8c;
             }
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                 height: 0px;
@@ -387,15 +392,15 @@ class Themes():
             }
 
             QProgressBar {
-                border: 2px solid #FFB7C5;
+                border: 2px solid #bd5b7d;
                 border-radius: 8px;
                 text-align: center;
-                color: #F5F5F5;
-                background-color: #1A1A1A;
+                color: #eeeeee;
+                background-color: #0b0b0b;
                 font-weight: bold;
             }
             QProgressBar::chunk {
-                background-color: #FF8FA3;
+                background-color: #ce6a8c;
                 border-radius: 6px;
             }
         """
