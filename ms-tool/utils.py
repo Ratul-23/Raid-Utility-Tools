@@ -28,7 +28,7 @@ excluded_drums: list[XYZ] = [
 ]
 
 
-class Utils():
+class Utils:
     def __init__(self) -> None:
         self.handler: ClientHandler = ClientHandler()
         self.config_parser: configparser.ConfigParser = configparser.ConfigParser()
@@ -37,14 +37,12 @@ class Utils():
         threading.Thread(target=self.update_foreground_client, daemon=True).start()
         threading.Thread(target=lambda: asyncio.run(self.update_hooked_text()), daemon=True).start()
 
-
     def update_foreground_client(self) -> None:
         while True:
-            if (client := self.handler.get_foreground_client()):
+            if client := self.handler.get_foreground_client():
                 self.foreground_client = client
 
             time.sleep(0.1)
-
 
     async def update_hooked_text(self) -> None:
         async def write_window_rectangle(window: Window, x1: int, y1: int, x2: int, y2: int) -> None:
@@ -56,16 +54,15 @@ class Utils():
         while True:
             for client in self.get_open_clients():
                 try:
-                    window: DynamicWindow = (await client.root_window.get_windows_with_name('txtTestRealmText'))[0]
+                    window: DynamicWindow = (await client.root_window.get_windows_with_name("txtTestRealmText"))[0]
                     await write_window_rectangle(window, 10, 146, 153, 165)
-                    await window.write_maybe_text('HOOKED')
+                    await window.write_maybe_text("HOOKED")
                     await window.write_flags(WindowFlags.visible)
 
                 except (IndexError, HookNotActive, MemoryWriteError):
                     pass
 
             await asyncio.sleep(1)
-
 
     def read_config(self) -> dict[str, bool | str]:
         settings: dict[str, bool | str] = {}
@@ -80,18 +77,18 @@ class Utils():
         settings["handle_xyz_sync"] = self.config_parser.get("Keybinds", "handle_xyz_sync", fallback="F3")
         settings["toggle_speedhack"] = self.config_parser.get("Keybinds", "toggle_speedhack", fallback="F4")
         settings["toggle_freecam"] = self.config_parser.get("Keybinds", "toggle_freecam", fallback="F5")
-        settings["handle_freecam_teleport"] = self.config_parser.get("Keybinds", "handle_freecam_teleport", fallback="F6")
+        settings["handle_freecam_teleport"] = self.config_parser.get(
+            "Keybinds", "handle_freecam_teleport", fallback="F6"
+        )
         settings["toggle_auto_dialogue"] = self.config_parser.get("Keybinds", "toggle_auto_dialogue", fallback="F7")
 
         return settings
-
 
     async def is_visible_by_path(self, base_window: Window, path: list[str]) -> bool:
         if window := await self.window_from_path(base_window, path):
             return await window.is_visible()
 
         return False
-
 
     async def window_from_path(self, base_window: Window, path: list[str]) -> Window | None:
         if not path:
@@ -104,12 +101,14 @@ class Utils():
 
         return None
 
-
     def are_xyzs_within_threshold(self, xyz_1: XYZ, xyz_2: XYZ, threshold: int = 200) -> bool:
-    # checks if 2 xyz's are within a rough distance threshold of each other. Not actual distance checking, but precision isn't needed for this, this exists to eliminate tiny variations in XYZ when being sent back from a failed port.
-        threshold_check: list[bool] = [abs(abs(xyz_1.x) - abs(xyz_2.x)) < threshold, abs(abs(xyz_1.y) - abs(xyz_2.y)) < threshold, abs(abs(xyz_1.z) - abs(xyz_2.z)) < threshold]
+        # checks if 2 xyz's are within a rough distance threshold of each other. Not actual distance checking, but precision isn't needed for this, this exists to eliminate tiny variations in XYZ when being sent back from a failed port.
+        threshold_check: list[bool] = [
+            abs(abs(xyz_1.x) - abs(xyz_2.x)) < threshold,
+            abs(abs(xyz_1.y) - abs(xyz_2.y)) < threshold,
+            abs(abs(xyz_1.z) - abs(xyz_2.z)) < threshold,
+        ]
         return all(threshold_check)
-
 
     def get_open_clients(self) -> list[Client]:
         self.handler.remove_dead_clients()
@@ -120,7 +119,6 @@ class Utils():
 
         return clients
 
-
     def rename_clients(self) -> None:
         clients: list[Client] = self.handler.get_new_clients()
 
@@ -130,11 +128,9 @@ class Utils():
         for i, client in enumerate(clients, 1):
             client.title = "Client: " + str(i)
 
-
     async def activate_hooks(self, client: Client) -> None:
         await client.activate_hooks()
         print(f"{client.title} hooks activated.")
-
 
     async def deactivate_hooks(self, client: Client) -> None:
         # hooked_window: DynamicWindow = (await client.root_window.get_windows_with_name('txtTestRealmText'))[0]
@@ -142,20 +138,18 @@ class Utils():
         await client.close()
         print(f"{client.title} hooks deactivated.")
 
-
     async def handle_auto_dialogue(self, client: Client) -> None:
         try:
             print(f"{client.title} auto dialogue activated.")
 
             while True:
-                if await self.is_visible_by_path(client.root_window, ['WorldView', 'wndDialogMain', 'btnRight']):
+                if await self.is_visible_by_path(client.root_window, ["WorldView", "wndDialogMain", "btnRight"]):
                     await client.send_key(Keycode.SPACEBAR)
 
                 await asyncio.sleep(0.5)
 
         except asyncio.CancelledError:
             print(f"{client.title} auto dialogue deactivated.")
-
 
     async def handle_speedhack(self, client: Client, multiplier: float) -> None:
         try:
@@ -168,7 +162,6 @@ class Utils():
         except asyncio.CancelledError:
             await client.client_object.write_speed_multiplier(1)
             print(f"{client.title} speedhack deactivated.")
-
 
     async def handle_freecam(self) -> XYZ | None:
         client: Client | None = self.foreground_client
@@ -190,14 +183,12 @@ class Utils():
 
         return None
 
-
     async def freecam_teleport(self, camera_pos: XYZ) -> None:
         client: Client | None = self.foreground_client
 
         if client:
             await client.teleport(camera_pos, wait_on_inuse=True, purge_on_after_unuser_fixer=True)
             print(f"{client.title} teleported to freecam position.")
-
 
     async def xyz_sync(self) -> None:
         client: Client | None = self.foreground_client
@@ -209,17 +200,17 @@ class Utils():
                 if teleporting_client is not client:
                     await teleporting_client.teleport(client_position)
 
-
     async def copy_position(self) -> None:
         client: Client | None = self.foreground_client
 
         if client:
             current_pos: XYZ = await client.body.position()
             print(f"{client.title} copied current position at {current_pos}.")
-            pyperclip.copy(f'XYZ({current_pos.x}, {current_pos.y}, {current_pos.z})')
+            pyperclip.copy(f"XYZ({current_pos.x}, {current_pos.y}, {current_pos.z})")
 
-
-    async def handle_basic_teleport(self, location_x: float, location_y: float, location_z: float, yaw: float | None = None) -> None:
+    async def handle_basic_teleport(
+        self, location_x: float, location_y: float, location_z: float, yaw: float | None = None
+    ) -> None:
         client: Client | None = self.foreground_client
 
         if client:
@@ -227,7 +218,6 @@ class Utils():
                 await client.teleport(XYZ(location_x, location_y, location_z), yaw)
             else:
                 await client.teleport(XYZ(location_x, location_y, location_z))
-
 
     async def wisp_teleport(self) -> None:
         client: Client | None = self.foreground_client
@@ -245,7 +235,6 @@ class Utils():
             await client.teleport(original_location)
             print(f"{client.title} wisp teleport complete.")
 
-
     async def entity_teleport(self, entity_name: str) -> None:
         client: Client | None = self.foreground_client
 
@@ -258,7 +247,6 @@ class Utils():
 
             await WorldsCollideTP(client, await entity[0].location())
             print(f"{client.title} teleported to {entity_name}.")
-
 
     async def mob_entity_teleport(self, entity_name: str) -> None:
         client: Client | None = self.foreground_client
@@ -278,7 +266,6 @@ class Utils():
             await WorldsCollideTP(client, entity_pos)
             print(f"{client.title} teleported to {entity_name}.")
 
-
     async def entity_freecam_teleport(self, entity_name: str) -> None:
         client: Client | None = self.foreground_client
 
@@ -295,7 +282,6 @@ class Utils():
             if entity and camera:
                 await camera.write_position(await entity.location())
                 print(f"{client.title} camera teleported to {entity_name}.")
-
 
     async def grab_item(self, entity_name: str) -> None:
         client: Client | None = self.foreground_client
@@ -315,14 +301,18 @@ class Utils():
             if await client.body.position() == original_location:
                 return
 
-            while not await self.is_visible_by_path(client.root_window, ['WorldView', 'NPCRangeWin', 'wndTitleBackground']):
+            while not await self.is_visible_by_path(
+                client.root_window, ["WorldView", "NPCRangeWin", "wndTitleBackground"]
+            ):
                 if await client.body.position() == original_location:
                     break
 
                 await asyncio.sleep(0.1)
 
             while True:
-                if not await self.is_visible_by_path(client.root_window, ['WorldView', 'NPCRangeWin', 'wndTitleBackground']):
+                if not await self.is_visible_by_path(
+                    client.root_window, ["WorldView", "NPCRangeWin", "wndTitleBackground"]
+                ):
                     break
 
                 await client.send_key(Keycode.X, 0.1)
@@ -332,7 +322,6 @@ class Utils():
                 await client.teleport(original_location)
 
             print(f"{client.title} grabbed {entity_name}.")
-
 
     async def raid_drum_teleport(self) -> None:
         client: Client | None = self.foreground_client
@@ -355,7 +344,6 @@ class Utils():
                 drum: DynamicClientObject = filtered_drums[0]
                 await client.teleport(await drum.location())
 
-
     async def toggle_minimap(self, client: Client) -> None:
         windows: list[DynamicWindow] = await client.root_window.get_windows_with_type("BattlegroundMiniMapWindow")
 
@@ -365,45 +353,55 @@ class Utils():
 
         minimap_window: DynamicWindow = windows[0]
         curr_flags: WindowFlags = await minimap_window.flags()
-        await minimap_window.write_flags(curr_flags ^ WindowFlags(WindowFlags.visible) ^ WindowFlags(WindowFlags.disabled))
+        await minimap_window.write_flags(
+            curr_flags ^ WindowFlags(WindowFlags.visible) ^ WindowFlags(WindowFlags.disabled)
+        )
         print(f"{client.title} minimap toggled.")
-
 
     async def auto_raid_drums(self) -> None:
         client: Client | None = self.foreground_client
+        if not client:
+            return
 
-        if client:
-            try:
-                for i in range(8):
-                    filtered_drums: list[DynamicClientObject] = []
+        try:
+            for i in range(8):
+                try:
+                    async with asyncio.timeout(10.0):
+                        target_drum: DynamicClientObject | None = None
 
-                    while filtered_drums == []:
-                        drum_list: list[DynamicClientObject] = await client.get_base_entities_with_name("Raid_LightPad")
+                        while target_drum is None:
+                            for drum in await client.get_base_entities_with_name("Raid_LightPad"):
+                                drum_pos: XYZ = await drum.location()
 
-                        for drum in drum_list:
-                            drum_pos: XYZ = await drum.location()
+                                if not any(
+                                    self.are_xyzs_within_threshold(drum_pos, excluded) for excluded in excluded_drums
+                                ):
+                                    target_drum = drum
+                                    break
 
-                            if not any(self.are_xyzs_within_threshold(drum_pos, excluded) for excluded in excluded_drums):
-                                filtered_drums.append(drum)
+                            if target_drum is None:
+                                await asyncio.sleep(0.1)
 
-                        await asyncio.sleep(0.1)
+                        target_drum_gid: int = await target_drum.global_id_full()
+                        await client.teleport(await target_drum.location())
 
-                    target_drum: DynamicClientObject = filtered_drums[0]
-                    target_drum_gid: int = await target_drum.global_id_full()
-                    await client.teleport(await target_drum.location())
+                        while True:
+                            current_drum_gids: list[int] = [
+                                await drum.global_id_full()
+                                for drum in await client.get_base_entities_with_name("Raid_LightPad")
+                            ]
 
-                    while True:
-                        current_drums: list[DynamicClientObject] = await client.get_base_entities_with_name("Raid_LightPad")
-                        current_drum_gids: list[int] = [await drum.global_id_full() for drum in current_drums]
+                            if target_drum_gid not in current_drum_gids:
+                                break
 
-                        if target_drum_gid not in current_drum_gids:
-                            break
+                            await asyncio.sleep(0.1)
 
-                        await asyncio.sleep(0.1)
+                except TimeoutError:
+                    break
 
-                    print(f"{client.title} activated drum {i + 1}.")
+                print(f"{client.title} activated drum {i + 1}.")
 
-                print("[AUTO DRUMS] completed drums.")
+            print("[AUTO DRUMS] completed drums.")
 
-            except asyncio.CancelledError:
-                print(f"[AUTO DRUMS] cancelled at drum #{i + 1}.")
+        except asyncio.CancelledError:
+            print("[AUTO DRUMS] cancelled.")
