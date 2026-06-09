@@ -302,7 +302,7 @@ class Themes():
             QWidget {
                 background-color: #0b0b0b;
                 color: #eeeeee;
-                font-family: "Lucida Handwriting", "Brush Script MT", cursive;
+                font-family: "Segoe UI", sans-serif;
                 font-size: 13px;
             }
 
